@@ -1,5 +1,6 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet, ViewStyle } from "react-native";
+import { EPNColors } from "../constants/theme";
 
 interface NavigationButtonProps {
     title: string;
@@ -32,26 +33,23 @@ export const NavigationButton = ({
 const styles = StyleSheet.create({
     button: {
         padding: 16,
-        borderRadius: 8,
+        borderRadius: 10,
         alignItems: "center",
         justifyContent: "center",
         marginVertical: 8,
     }, primary: {
-        backgroundColor: "#3498db",
+        backgroundColor: EPNColors.primary,
     }, secondary: {
         backgroundColor: "transparent",
         borderWidth: 2,
-        borderColor: "#3498db",
+        borderColor: EPNColors.secondary,
     }, danger: {
-        backgroundColor: "#e74c3c",
+        backgroundColor: EPNColors.error,
     }, text: {
         color: "#fff",
         fontSize: 16,
         fontWeight: "600",
     }, textSecondary: {
-        color: "#3498db",
+        color: EPNColors.secondary,
     },
 });
-
-
-

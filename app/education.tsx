@@ -1,6 +1,4 @@
-// app/education.tsx
-
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -10,37 +8,52 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useForm, Controller } from "react-hook-form";
 import { InputField } from "../components/InputField";
 import { NavigationButton } from "../components/NavigationButton";
 import { useCVContext } from "../context/CVContext";
 import { Education } from "../types/cv.types";
+import { EPNColors } from "../constants/theme";
+
+interface EducationFormData {
+  institution: string;
+  degree: string;
+  field: string;
+  graduationYear: string;
+}
 
 export default function EducationScreen() {
   const router = useRouter();
   const { cvData, addEducation, deleteEducation } = useCVContext();
 
-  const [formData, setFormData] = useState<Omit<Education, "id">>({
-    institution: "",
-    degree: "",
-    field: "",
-    graduationYear: "",
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<EducationFormData>({
+    defaultValues: {
+      institution: "",
+      degree: "",
+      field: "",
+      graduationYear: "",
+    },
   });
 
-  const handleAdd = () => {
-    if (!formData.institution || !formData.degree) {
-      Alert.alert("Error", "Por favor completa al menos institución y título");
-      return;
-    }
+  const currentYear = new Date().getFullYear();
 
+  const onSubmit = (data: EducationFormData) => {
     const newEducation: Education = {
       id: Date.now().toString(),
-      ...formData,
+      institution: data.institution,
+      degree: data.degree,
+      field: data.field,
+      graduationYear: data.graduationYear || "",
     };
 
     addEducation(newEducation);
 
-    // Limpiar formulario
-    setFormData({
+    reset({
       institution: "",
       degree: "",
       field: "",
@@ -66,40 +79,97 @@ export default function EducationScreen() {
       <View style={styles.content}>
         <Text style={styles.sectionTitle}>Agregar Nueva Educación</Text>
 
-        <InputField
-          label="Institución *"
-          placeholder="Nombre de la universidad/institución"
-          value={formData.institution}
-          onChangeText={(text) =>
-            setFormData({ ...formData, institution: text })
-          }
+        <Controller
+          control={control}
+          rules={{ required: "La institución es requerida" }}
+          name="institution"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <InputField
+              label="Institución *"
+              placeholder="Nombre de la universidad/institución"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              error={errors.institution?.message}
+            />
+          )}
         />
 
-        <InputField
-          label="Título/Grado *"
-          placeholder="Ej: Licenciatura, Maestría"
-          value={formData.degree}
-          onChangeText={(text) => setFormData({ ...formData, degree: text })}
+        <Controller
+          control={control}
+          rules={{ 
+            required: "El título es requerido",
+            pattern: {
+                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+                message: "Este campo solo debe contener letras"
+            }
+          }}
+          name="degree"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <InputField
+              label="Título/Grado *"
+              placeholder="Ej: Licenciatura, Maestría"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              error={errors.degree?.message}
+            />
+          )}
         />
 
-        <InputField
-          label="Área de Estudio"
-          placeholder="Ej: Ingeniería en Sistemas"
-          value={formData.field}
-          onChangeText={(text) => setFormData({ ...formData, field: text })}
+        <Controller
+          control={control}
+          name="field"
+          rules={{
+            pattern: {
+                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+                message: "Este campo solo debe contener letras"
+            }
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <InputField
+              label="Área de Estudio"
+              placeholder="Ej: Ingeniería en Sistemas"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              error={errors.field?.message}
+            />
+          )}
         />
 
-        <InputField
-          label="Año de Graduación"
-          placeholder="Ej: 2023"
-          value={formData.graduationYear}
-          onChangeText={(text) =>
-            setFormData({ ...formData, graduationYear: text })
-          }
-          keyboardType="numeric"
+        <Controller
+          control={control}
+          name="graduationYear"
+          rules={{
+            pattern: {
+              value: /^(19|20)\d{2}$/,
+              message: "Ingresa un año de 4 dígitos válido",
+            },
+            validate: (value) => {
+              if (!value) return true;
+              const year = parseInt(value, 10);
+              if (year < 1950 || year > currentYear + 10) {
+                return "El año está fuera del rango permitido";
+              }
+              return true;
+            },
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <InputField
+              label="Año de Graduación"
+              placeholder="Ej: 2024"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              keyboardType="numeric"
+              maxLength={4}
+              error={errors.graduationYear?.message}
+            />
+          )}
         />
 
-        <NavigationButton title="Agregar Educación" onPress={handleAdd} />
+        <NavigationButton title="Agregar Educación" onPress={handleSubmit(onSubmit)} />
 
         {cvData.education.length > 0 && (
           <>
@@ -137,7 +207,7 @@ export default function EducationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: EPNColors.background,
   },
   content: {
     padding: 20,
@@ -145,23 +215,23 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#2c3e50",
+    color: EPNColors.secondary,
     marginBottom: 16,
   },
   listTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#2c3e50",
+    color: EPNColors.secondary,
     marginTop: 24,
     marginBottom: 12,
   },
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: EPNColors.white,
     borderRadius: 8,
     padding: 16,
     marginBottom: 12,
     flexDirection: "row",
-    shadowColor: "#000",
+    shadowColor: EPNColors.secondary,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -173,33 +243,33 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#2c3e50",
+    color: EPNColors.secondary,
     marginBottom: 4,
   },
   cardSubtitle: {
     fontSize: 14,
-    color: "#7f8c8d",
+    color: EPNColors.textSecondary,
     marginBottom: 4,
   },
   cardInstitution: {
     fontSize: 14,
-    color: "#95a5a6",
+    color: EPNColors.textSecondary,
     marginBottom: 2,
   },
   cardDate: {
     fontSize: 12,
-    color: "#95a5a6",
+    color: EPNColors.textSecondary,
   },
   deleteButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#e74c3c",
+    backgroundColor: EPNColors.error,
     justifyContent: "center",
     alignItems: "center",
   },
   deleteButtonText: {
-    color: "#fff",
+    color: EPNColors.white,
     fontSize: 18,
     fontWeight: "bold",
   },

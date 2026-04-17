@@ -1,13 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { useCVContext } from "../context/CVContext";
+import { EPNColors } from "../constants/theme";
 
 export default function HomeScreen() {
   const router = useRouter();
   const { cvData } = useCVContext();
-
-  console.log("CV Data cargado:", cvData); // Para debugging
 
   const isPersonalInfoComplete =
     cvData.personalInfo.fullName && cvData.personalInfo.email;
@@ -15,8 +14,16 @@ export default function HomeScreen() {
   const hasEducation = cvData.education.length > 0;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Crea tu CV Profesional</Text>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <View style={styles.header}>
+        <Image
+          source={require("../assets/images/epn-shield.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <Text style={styles.title}>Crea tu CV</Text>
+        <Text style={styles.subtitle}>Escuela Politécnica Nacional</Text>
+      </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>1. Información Personal</Text>
@@ -63,30 +70,47 @@ export default function HomeScreen() {
 
       <View style={{ marginTop: 30 }}>
         <TouchableOpacity
-          style={[styles.button, { backgroundColor: "#2ecc71" }]}
+          style={[styles.button, { backgroundColor: EPNColors.secondary }]}
           onPress={() => router.push("/preview")}
         >
           <Text style={styles.buttonText}>Ver Vista Previa del CV</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: EPNColors.background,
+  },
+  contentContainer: {
     padding: 20,
-    backgroundColor: "#f5f5f5",
+    paddingBottom: 40,
+  },
+  header: {
+    alignItems: "center",
+    marginBottom: 32,
+    paddingVertical: 24,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    marginBottom: 8,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 20,
-    color: "#2c3e50",
+    color: EPNColors.secondary,
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: EPNColors.textSecondary,
   },
   section: {
-    backgroundColor: "#fff",
+    backgroundColor: EPNColors.white,
     padding: 16,
     borderRadius: 12,
     marginBottom: 16,
@@ -94,21 +118,21 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#2c3e50",
+    color: EPNColors.secondary,
     marginBottom: 8,
   },
   status: {
     fontSize: 14,
-    color: "#27ae60",
+    color: EPNColors.success,
     marginBottom: 12,
   },
   button: {
-    backgroundColor: "#3498db",
-    padding: 16,
+    backgroundColor: EPNColors.primary,
+    padding: 14,
     borderRadius: 8,
   },
   buttonText: {
-    color: "#fff",
+    color: EPNColors.white,
     fontSize: 16,
     textAlign: "center",
     fontWeight: "600",

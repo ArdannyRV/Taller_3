@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 import { CVData } from "../types/cv.types";
+import { EPNColors } from "../constants/theme";
 
 interface CVPreviewProps {
   cvData: CVData;
@@ -12,8 +13,12 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        {/* Header con información personal */}
         <View style={styles.header}>
+          <Image
+            source={require("../assets/images/epn-shield.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
           <Text style={styles.name}>
             {personalInfo.fullName || "Tu Nombre"}
           </Text>
@@ -30,7 +35,6 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
           </View>
         </View>
 
-        {/* Resumen profesional */}
         {personalInfo.summary && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>RESUMEN PROFESIONAL</Text>
@@ -38,7 +42,6 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
           </View>
         )}
 
-        {/* Experiencia laboral */}
         {experiences.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>EXPERIENCIA LABORAL</Text>
@@ -57,7 +60,6 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
           </View>
         )}
 
-        {/* Educación */}
         {education.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>EDUCACIÓN</Text>
@@ -76,7 +78,6 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
           </View>
         )}
 
-        {/* Mensaje si no hay datos */}
         {!personalInfo.fullName &&
           experiences.length === 0 &&
           education.length === 0 && (
@@ -95,29 +96,36 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: EPNColors.white,
   },
   content: {
     padding: 20,
   },
   header: {
     borderBottomWidth: 2,
-    borderBottomColor: "#3498db",
+    borderBottomColor: EPNColors.primary,
     paddingBottom: 16,
     marginBottom: 24,
+    alignItems: "center",
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    marginBottom: 12,
   },
   name: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: "bold",
-    color: "#2c3e50",
+    color: EPNColors.secondary,
     marginBottom: 12,
+    textAlign: "center",
   },
   contactInfo: {
     gap: 4,
   },
   contactText: {
     fontSize: 14,
-    color: "#7f8c8d",
+    color: EPNColors.textSecondary,
     marginBottom: 4,
   },
   section: {
@@ -126,46 +134,46 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#3498db",
+    color: EPNColors.primary,
     marginBottom: 12,
     letterSpacing: 1,
   },
   summaryText: {
     fontSize: 14,
-    color: "#34495e",
+    color: EPNColors.textPrimary,
     lineHeight: 20,
   },
   item: {
     marginBottom: 16,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#ecf0f1",
+    borderBottomColor: EPNColors.border,
   },
   itemTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#2c3e50",
+    color: EPNColors.secondary,
     marginBottom: 4,
   },
   itemSubtitle: {
     fontSize: 14,
-    color: "#7f8c8d",
+    color: EPNColors.textSecondary,
     marginBottom: 4,
   },
   itemInstitution: {
     fontSize: 14,
-    color: "#95a5a6",
+    color: EPNColors.textSecondary,
     marginBottom: 4,
   },
   itemDate: {
     fontSize: 12,
-    color: "#95a5a6",
+    color: EPNColors.textSecondary,
     fontStyle: "italic",
     marginBottom: 8,
   },
   itemDescription: {
     fontSize: 13,
-    color: "#34495e",
+    color: EPNColors.textPrimary,
     lineHeight: 18,
   },
   emptyState: {
@@ -176,9 +184,8 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: "#95a5a6",
+    color: EPNColors.textSecondary,
     textAlign: "center",
     lineHeight: 24,
   },
 });
-
